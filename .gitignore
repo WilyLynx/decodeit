@@ -2,3 +2,4 @@
 *.pdf
 /paper_6
 /test_6
+/__pycache__
