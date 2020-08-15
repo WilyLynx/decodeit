@@ -1,5 +1,7 @@
 from seven import Board, BoardController, ROP
 import random
+import time
+
 
 
 class BoardVisualizer(BoardController):
@@ -39,26 +41,30 @@ class BoardCreator:
             yield Board(H, W, C, balls)
 
 
-H = 4
-W = 4
-C = 3
-balls = [
-    ['0', '0', '1', '1'],
-    ['1', '1', '2', '2'],
-    ['0', '1', '2', '0'],
-    ['0', '1', '1', '2'],
-]
+# H = 4
+# W = 4
+# C = 3
+# balls = [
+#     ['0', '0', '1', '1'],
+#     ['1', '1', '2', '2'],
+#     ['0', '1', '2', '0'],
+#     ['0', '1', '1', '2'],
+# ]
+start = time.time_ns()
+H_range = (4, 50)
+W_range = (4, 50)
+C_range = (3, 20)
 
-H_range = (2, 10)
-W_range = (2, 10)
-C_range = (2, 5)
 
 creator = BoardCreator(H_range, W_range, C_range)
 
-for b in creator.create_series(1):
-    controller = BoardVisualizer(b)
-    player = ROPVisualizer(controller)
-    controller.print()
+for b in creator.create_series(500):
+    controller = BoardController(b)
+    player = ROP(controller)
+    #controller.print()
     score = player.play()
     print(score)
     print()
+
+end = time.time_ns()
+print(f'Execution time: {(end-start) // 10**6} [ms]')
