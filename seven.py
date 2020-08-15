@@ -25,11 +25,13 @@ class BoardController:
                         blank_count += 1
                 elif blank_count > 0:
                     k = 0
-                    while self.board.balls[i+k] not in ['.', '-']:
-                        self.board.balls[blank_beg - k][j] = self.board.balls[i-k][j]
+                    while self.board.balls[i - k] not in ['.', '-']:
+                        self.board.balls[blank_beg - k][j] = self.board.balls[i - k][j]
                         k += 1
-                        if i+k >= self.board.H:
+                        if i - k < 0:
                             break
+                    for x in range(blank_count):
+                        self.board.balls[x][j] = '.'
                     blank_count = 0
             k = 0
             while self.board.balls[k][j] in ['.', '-']:
@@ -40,6 +42,8 @@ class BoardController:
 
     def is_move_possible(self, x, y):
         col = self.board.balls[x][y]
+        if col == '-' or col == '.':
+            return False
         if x + 1 < self.board.H:
             if col == self.board.balls[x + 1][y]:
                 return True
@@ -79,12 +83,41 @@ class BoardController:
             n += self._destroy_neighbours(x, y + 1, visited_areas, col)
             return n
 
-#
-# boards = []
-# for _ in range(int(input())):
-#     line = input().split()
-#     H = int(line[0])
-#     W = int(line[1])
-#     C = int(line[2])
-#     balls = [input().split() for _ in range(H)]
-#     boards.append(BoardController(Board(H, W, C, balls)))
+
+class ROP:
+    def __init__(self, controller: BoardController):
+        self.controller = controller
+
+    def play(self):
+        score = 0
+        print('Y')
+        continue_game = True
+        x = self.controller.board.H - 1
+        while continue_game:
+            continue_game = False
+            for y in range(self.controller.board.W):
+                if self.controller.is_move_possible(x, y):
+                    score += self._submit_move(x, y)
+                    continue_game = True
+        print(f"-1 -1")
+        return score
+
+    def _submit_move(self, x, y):
+        print(f"{x} {y}")
+        return self.controller.make_move(x, y)
+
+
+
+boards = []
+t = int(input())
+for _ in range(t):
+    line = input().split()
+    while len(line) != 3:
+        line = input().split()
+    H = int(line[0])
+    W = int(line[1])
+    C = int(line[2])
+    balls = [input().split() for _ in range(H)]
+    boards.append(ROP(BoardController(Board(H, W, C, balls))))
+for i in range(t):
+    boards[i].play()
